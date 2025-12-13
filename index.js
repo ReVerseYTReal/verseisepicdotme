@@ -1,18 +1,32 @@
-// Catch uncaught JavaScript errors
-window.addEventListener("error", (event) => {
-    console.error("Caught error:", event.message);
+const express = require("express");
+const path = require("path");
+const app = express();
+const PORT = process.env.PORT || 3000;
 
-    // Optional: check error type here
-    // If you want to ignore certain errors, add conditions
-    window.location.href = "/500.html";
+// Serve static files (your HTML error pages)
+app.use(express.static(path.join(__dirname, "public"))); // Put 404.html, 500.html, etc. in /public
+
+// Example route
+app.get("/", (req, res) => {
+  res.sendFile(path.join(__dirname, "public", "index.html"));
 });
 
-// Catch unhandled promise rejections (e.g., fetch failures)
-window.addEventListener("unhandledrejection", (event) => {
-    console.error("Unhandled promise rejection:", event.reason);
+// Force a 500 error for testing
+app.get("/error500", (req, res) => {
+  res.status(500).sendFile(path.join(__dirname, "public", "500.html"));
+});
 
-    // Only redirect if error is not 404
-    if (event.reason?.status !== 404) {
-        window.location.href = "/500.html";
-    }
+// Force a 505 error for testing
+app.get("/error505", (req, res) => {
+  res.status(505).sendFile(path.join(__dirname, "public", "505.html"));
+});
+
+// Catch-all for 404 (must be after all other routes)
+app.use((req, res) => {
+  res.status(404).sendFile(path.join(__dirname, "public", "404.html"));
+});
+
+// Start server
+app.listen(PORT, () => {
+  console.log(`Server running on port ${PORT}`);
 });
