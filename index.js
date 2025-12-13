@@ -30,3 +30,7 @@ app.use((req, res) => {
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });
+// Force a 418 error for fun
+app.get("/error418", (req, res) => {
+  res.status(418).sendFile(path.join(__dirname, "public", "418.html"));
+});
